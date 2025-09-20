@@ -1,0 +1,21 @@
+# ===============================
+# AI Service Dependencies
+# ===============================
+
+# API Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# Data Handling
+pandas==2.3.2
+numpy==1.26.4
+
+# Machine Learning
+scikit-learn==1.5.1
+joblib==1.4.2
+
+# API Requests (if needed)
+requests==2.32.3
+
+# Environment variable handling
+python-dotenv==1.0.1

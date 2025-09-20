@@ -1,0 +1,11 @@
+Soil_Type,Rainfall_mm,Temperature_C,Fertilizer_Used_kg_per_acre,Crop,Yield_quintals_per_acre
+Sandy,950,28,40,Rice,22
+Clay,450,32,30,Wheat,18
+Loam,600,25,35,Maize,20
+Sandy,870,29,42,Rice,23
+Clay,520,31,28,Wheat,17
+Loam,700,24,36,Maize,21
+Sandy,1020,27,45,Rice,24
+Clay,400,33,25,Wheat,16
+Loam,650,26,38,Maize,19
+Sandy,890,30,41,Rice,25
