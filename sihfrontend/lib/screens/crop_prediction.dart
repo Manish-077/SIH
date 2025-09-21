@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class CropPrediction extends StatefulWidget {
   final String Function(String) t;
@@ -14,9 +15,23 @@ class _CropPredictionState extends State<CropPrediction> {
   String temp = '';
   String prevYield = '';
 
-  void _getPrediction() {
-    // placeholder logic
-    showDialog(context: context, builder: (_) => AlertDialog(title: Text('Prediction'), content: Text('Prediction requested for $location'), actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text('OK'))]));
+  void _getPrediction() async {
+    final inputData = {
+      'location': location,
+      'soil': soil,
+      'rainfall': rainfall,
+      'temp': temp,
+      'prevYield': prevYield,
+    };
+    final prediction = await ApiService().getPrediction(inputData);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Prediction'),
+        content: Text(prediction != null ? 'Predicted yield: $prediction' : 'Prediction failed'),
+        actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text('OK'))]
+      )
+    );
   }
 
   @override

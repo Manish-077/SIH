@@ -11,12 +11,15 @@ class FarmerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome, Manish!'),
+        title: Text('Farmer Dashboard'),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (v) => setLocale(v),
-            itemBuilder: (_) => [PopupMenuItem(value: 'en', child: Text('English')), PopupMenuItem(value: 'hi', child: Text('Hindi'))],
-          )
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              // Clear any saved login state if needed
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
         ],
       ),
       body: Padding(

@@ -1,34 +1,30 @@
-const asyncHandler = require('express-async-handler');
+const Prediction = require('../models/Prediction');
 const Farmer = require('../models/Farmer');
 const { getPrediction } = require('../services/pythonService');
 
-const predictYield = asyncHandler(async (req, res) => {
-  // input from farmer app
-  const { location, soilType, pastYield, rainfall, temp } = req.body;
-  if (!location || !soilType) { res.status(400); throw new Error('Missing required fields'); }
+exports.predictCropYield = async (req, res) => {
+    try {
+        const farmerData = req.body;
+        // Call Flask AI service via pythonService.js
+        const aiRes = await getPrediction(farmerData);
+        const prediction = aiRes.prediction;
 
-  const aiPayload = { location, soilType, pastYield, rainfall, temp };
+        // Save farmer info and prediction
+        let farmer = await Farmer.findOne({ phone: farmerData.phone });
+        if (!farmer) {
+            farmer = new Farmer(farmerData);
+            await farmer.save();
+        }
+        const pred = new Prediction({
+            farmer: farmer._id,
+            input: farmerData,
+            result: prediction,
+            timestamp: new Date()
+        });
+        await pred.save();
 
-  // call python ai service
-  const aiRes = await getPrediction(aiPayload);
-  // expected aiRes: { recommendedCrop, predictedYield, fertilizerSuggestion, ... }
-
-  const predictionDoc = {
-    input: aiPayload,
-    recommendedCrop: aiRes.recommendedCrop,
-    predictedYield: aiRes.predictedYield,
-    fertilizer: aiRes.fertilizerSuggestion || aiRes.fertilizer,
-    rawAIResponse: aiRes
-  };
-
-  // if user authenticated, save prediction to their history
-  if (req.farmer) {
-    const farmer = await Farmer.findById(req.farmer._id);
-    farmer.predictions.push(predictionDoc);
-    await farmer.save();
-  }
-
-  res.json({ success: true, prediction: predictionDoc });
-});
-
-module.exports = { predictYield };
+        res.json({ prediction });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { predictYield } = require('../controllers/predictionController');
-const { protect } = require('../middleware/authMiddleware');
+const { predictCropYield } = require('../controllers/predictionController');
 
-// Use protect to require login; remove protect if public access is desired
-router.post('/', protect, predictYield);
+router.post('/', predictCropYield);
 
 module.exports = router;

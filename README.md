@@ -42,11 +42,11 @@ Farmer App & Admin Dashboard (React Web)
 ```
 AI-Crop-Optimization/
 │
-├── frontend/            # Flutter Farmer App
-├── admin-dashboard/     # React Admin Web App
-├── backend/             # Node.js + Express + MongoDB
-├── ai_service/          # Python AI Microservice
-└── docs/                # Documentation (wireframes, ppt, readme)
+├── sihfrontend/            # Flutter Farmer App
+├── Admin_Dashboard/        # React Admin Web App
+├── backend-main/           # Node.js + Express + MongoDB
+├── ai_service/             # Python AI Microservice
+└── docs/                   # Documentation (wireframes, ppt, readme)
 ```
 
 ---
@@ -60,59 +60,73 @@ AI-Crop-Optimization/
 
 ---
 
-## 📊 Impact & Benefits
-- **Social:** Improves farmer decision-making → better livelihoods.  
-- **Economic:** Increases yield by 15–20%, reduces input cost by 10–15%.  
-- **Environmental:** Optimizes fertilizer/water use → 25% savings.  
-- **Scalability:** Can expand nationwide to benefit **120M+ farmers**.  
+## 🛠️ Setup Instructions
+
+### 1. AI Service (Flask)
+- Install Python 3.9+, `pip install -r requirements.txt`
+- Run: `python app.py`
+- Ensure model files (`yield_model.pkl`, etc.) are present
+
+### 2. Backend (Node.js)
+- Install Node.js, `npm install`
+- Set up `.env` with MongoDB URI, JWT secret, AI service URL
+- Run: `nodemon app.js`
+
+### 3. Farmer App (Flutter)
+- Install Flutter SDK
+- Run: `flutter pub get`
+- Run: `flutter run`
+- Update API base URL in `config.dart` if needed
+
+### 4. Admin Dashboard (React)
+- Install Node.js, `npm install`
+- Set `REACT_APP_API_BASE_URL` in `.env`
+- Run: `npm run dev`
 
 ---
 
-## 🛠️ How to Run
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/your-repo/AI-Crop-Optimization.git
-cd AI-Crop-Optimization
-```
-
-### 2. Setup AI Service
-```bash
-cd ai_service
-pip install -r requirements.txt
-python app.py
-```
-
-### 3. Setup Backend
-```bash
-cd backend
-npm install
-npm start
-```
-
-### 4. Setup Farmer App
-```bash
-cd frontend
-flutter pub get
-flutter run
-```
-
-### 5. Setup Admin Dashboard
-```bash
-cd admin-dashboard
-npm install
-npm start
-```
+## ✅ Demo Checklist
+- All screens filled with real or demo data
+- Farmer → Backend → AI → DB → Admin flow works
+- No empty pages
+- Multi-language support (English/Hindi)
+- Analytics and charts for admin
+- Secure authentication and validation
+- Easy environment switching (localhost/production)
 
 ---
 
-## 🔮 Future Scope
-- IoT-based soil sensors & drones.  
-- Insurance tie-ups for automated claim verification.  
-- Global expansion (Africa, SE Asia).  
+## 🏆 SIH Judging Tips
+- Show end-to-end flow: Farmer input → prediction → analytics
+- Highlight multi-language and accessibility features
+- Demonstrate admin dashboard insights and dataset upload
+- Mention security, scalability, and real-world impact
+
+## 🏆 SIH Pitch Tips
+- **Start with the problem:** Briefly explain the real-world challenge for farmers and why your solution matters.
+- **Show the full flow:** Demo Farmer App input → prediction → analytics in Admin Dashboard.
+- **Highlight AI:** Explain how your ML model adapts to new data and can be retrained with admin-uploaded datasets.
+- **Emphasize impact:** Mention how your system helps farmers, government, and insurance companies.
+- **Accessibility:** Point out multi-language support and offline/SMS features for rural users.
+- **Security:** Note use of JWT, validation, and secure data storage.
+- **Scalability:** Mention cloud-readiness and easy environment switching.
+- **Teamwork:** Credit your team and mention collaboration.
+
+## 🎬 Demo Script
+1. **Farmer App:**
+   - Login/Signup (show multi-language toggle)
+   - Enter soil, rainfall, temp, fertilizer
+   - Get prediction and see weather/schemes/profile
+2. **Backend:**
+   - Show logs/API calls for prediction and data storage
+3. **Admin Dashboard:**
+   - Login, view analytics, charts, farmers, upload dataset
+   - Show how new data can retrain the AI model
+4. **Wrap-up:**
+   - Summarize impact, scalability, and future roadmap
 
 ---
 
-## 👥 Team Outcast
-- Problem Statement: **SIH25044 – AI-Powered Crop Yield Prediction & Optimization**  
-- Smart India Hackathon 2026 Submission  
+For any issues, check backend/API logs, ensure all services are running, and verify environment variables. Good luck at SIH!
+
+**Good luck! Your project is now optimized for SIH judging and demo.**

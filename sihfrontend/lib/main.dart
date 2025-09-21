@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/farmer_dashboard.dart';
 import 'screens/crop_prediction.dart';
 import 'screens/weather_forecast.dart';
@@ -30,11 +31,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String locale = 'en';
 
-  // 🔑 Global API base URL (Backend server)
-  static const String apiBaseUrl = "http://localhost:5000/api";
-  // ⚠️ Change this when deploying:
-  // Example: "http://192.168.1.5:5000/api" (LAN)
-  // or "https://yourdomain.com/api" (Production)
+  // API base URL is managed in api_service.dart
 
   void setLocale(String l) {
     setState(() {
@@ -56,6 +53,10 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (c) => LoginScreen(
               onLogin: () => Navigator.pushReplacementNamed(c, '/dashboard'),
+              t: t,
+            ),
+        '/signup': (c) => SignupScreen(
+              onSignup: () => Navigator.pushReplacementNamed(c, '/dashboard'),
               t: t,
             ),
         '/dashboard': (c) => FarmerDashboard(

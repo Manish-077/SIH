@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // for FilteringTextInputFormatter
 
+import '../../../services/api_service.dart'; // Update with your actual import
+
 class LoginScreen extends StatefulWidget {
   final VoidCallback onLogin;
   final String Function(String) t;
@@ -15,9 +17,18 @@ class _LoginScreenState extends State<LoginScreen> {
   String phone = '';
   String password = '';
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
-      widget.onLogin();
+      // Call backend to check if farmer exists and password matches
+      final res = await ApiService().loginFarmer({
+        'phone': phone,
+        'password': password,
+      });
+      if (res == true) {
+        widget.onLogin();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid credentials.')));
+      }
     }
   }
 
@@ -25,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(   // ✅ prevents keyboard issues
+        child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 30),
           child: Form(
             key: _formKey,
@@ -55,7 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                   maxLength: 10,
                   onChanged: (v) => phone = v,
-                  
+                  validator: (v) {
+                    if (v == null || v.length != 10) return 'Enter a valid 10-digit mobile number';
+                    return null;
+                  },
                 ),
                 SizedBox(height: 16),
 
@@ -67,7 +81,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   obscureText: true,
                   onChanged: (v) => password = v,
-                  
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Password required';
+                    return null;
+                  },
                 ),
                 SizedBox(height: 24),
 
@@ -86,7 +103,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signup');
+                        },
                         child: Text('New User? Register here')),
                     TextButton(
                         onPressed: () {}, child: Text('Forgot Password?')),

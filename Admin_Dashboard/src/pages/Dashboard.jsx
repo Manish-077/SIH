@@ -1,8 +1,26 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FarmerTable from '../components/NavBar';
 
-export default function App() {
+export default function Dashboard() {
+  const [predictions, setPredictions] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('http://localhost:4000/api/admin/analytics')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.predictions) {
+          setPredictions(data.predictions);
+        }
+      });
+  }, []);
+
+  const handleLogout = () => {
+    // Clear any auth state here (e.g., localStorage.removeItem('token'))
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 font-sans text-gray-800">
       {/* Sidebar */}
@@ -13,7 +31,10 @@ export default function App() {
         {/* Header */}
         <header className="flex items-center justify-between border-b border-gray-200 bg-white p-4">
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <button className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50">
+          <button
+            className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </header>
@@ -25,23 +46,12 @@ export default function App() {
             <h2 className="mb-4 text-xl font-semibold">Quick Stats</h2>
             <div className="grid grid-cols-3 gap-6">
               <div className="rounded border border-gray-200 bg-white p-4">
-                <p className="text-3xl font-bold">120</p>
+                <p className="text-3xl font-bold">{predictions.length}</p>
                 <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200">
                   <div className="h-1.5 w-3/4 rounded-full bg-black"></div>
                 </div>
               </div>
-              <div className="rounded border border-gray-200 bg-white p-4">
-                <p className="text-3xl font-bold">30</p>
-                <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200">
-                  <div className="h-1.5 w-1/2 rounded-full bg-black"></div>
-                </div>
-              </div>
-              <div className="rounded border border-gray-200 bg-white p-4">
-                <p className="text-3xl font-bold">5</p>
-                <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200">
-                  <div className="h-1.5 w-1/4 rounded-full bg-black"></div>
-                </div>
-              </div>
+              {/* Add more stats as needed */}
             </div>
           </div>
 
@@ -59,24 +69,14 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="px-6 py-4">Farmer Fornut</td>
-                    <td className="px-6 py-4">12005 JM</td>
-                    <td className="px-6 py-4">20005 JM</td>
-                    <td className="px-6 py-4">60deui</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="px-6 py-4">Farmer Fornut</td>
-                    <td className="px-6 py-4">39.05 JM</td>
-                    <td className="px-6 py-4">75205 JM</td>
-                    <td className="px-6 py-4">60deui</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4">Farmer Fornut</td>
-                    <td className="px-6 py-4">56.05 JM</td>
-                    <td className="px-6 py-4">72205 JM</td>
-                    <td className="px-6 py-4">60deui</td>
-                  </tr>
+                  {predictions.map((item, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="px-6 py-4">{item.farmer?.name}</td>
+                      <td className="px-6 py-4">{item.farmer?.location}</td>
+                      <td className="px-6 py-4">{JSON.stringify(item.input)}</td>
+                      <td className="px-6 py-4">{item.result}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
