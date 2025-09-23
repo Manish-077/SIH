@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { loginAdmin } from '../services/apiService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,15 +23,11 @@ const Login = () => {
       setError('Please enter a valid email address.');
       return;
     }
-    const res = await fetch('http://localhost:4000/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    if (res.ok) {
-      // handle success
+    try {
+      const data = await loginAdmin({ email, password });
+      localStorage.setItem('token', data.token);
       navigate('/farmers');
-    } else {
+    } catch (error) {
       setError('Login failed. Please check your credentials.');
     }
   };

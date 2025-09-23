@@ -1,18 +1,23 @@
 
 import React, { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
+import { getFarmers } from '../services/apiService';
 
 const Farmers = () => {
   const [farmers, setFarmers] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/admin/analytics')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.predictions) {
-          setFarmers(data.predictions);
-        }
-      });
+    const fetchFarmers = async () => {
+      try {
+        const data = await getFarmers();
+        setFarmers(data);
+      } catch (err) {
+        setError('Failed to fetch farmers.');
+      }
+    };
+
+    fetchFarmers();
   }, []);
 
   return (
@@ -20,24 +25,21 @@ const Farmers = () => {
       <NavBar/>
       <div className="bg-white p-6 rounded-lg shadow-sm w-full">
         <h2 className="text-2xl font-bold text-gray-800">Farmers</h2>
+        {error && <div className="text-red-500">{error}</div>}
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th>Farmer Name</th>
-              <th>District</th>
-              <th>Input Data</th>
-              <th>Predicted Yield</th>
-              <th>Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">District</th>
             </tr>
           </thead>
-          <tbody>
-            {farmers.map((item, idx) => (
-              <tr key={idx}>
-                <td>{item.farmer?.name}</td>
-                <td>{item.farmer?.location}</td>
-                <td>{JSON.stringify(item.input)}</td>
-                <td>{item.result}</td>
-                <td>{item.timestamp?.slice(0,10)}</td>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {farmers.map((farmer) => (
+              <tr key={farmer._id}>
+                <td className="px-6 py-4 whitespace-nowrap">{farmer.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{farmer.phone}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{farmer.location}</td>
               </tr>
             ))}
           </tbody>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { uploadDataset } from '../services/api';
+import { uploadDataset } from '../services/apiService';
 
 const FileUploader = () => {
     const handleFileChange = async (e) => {

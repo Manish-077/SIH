@@ -1,71 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../services/api_service.dart';
 
 class FarmerDashboard extends StatelessWidget {
-  final Function(String) onNavigate;
-  final String Function(String) t;
-  final Function(String) setLocale;
-
-  FarmerDashboard({required this.onNavigate, required this.t, required this.setLocale});
+  final ApiService _apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Farmer Dashboard'),
+        title: Text('app_title'.tr()),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
-              // Clear any saved login state if needed
+              _apiService.deleteToken();
               Navigator.pushReplacementNamed(context, '/');
             },
-          ),
+          )
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(18),
-        child: Column(
-          children:[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children:[
-                  _Card(title:'Predict Crop Yield', onTap: () => onNavigate('/crop_prediction')),
-                  SizedBox(width:12),
-                  _Card(title:'Weather Forecast', onTap: () => onNavigate('/weather_forecast')),
-                  SizedBox(width:12),
-                  _Card(title:'Govt. Schemes', onTap: () => onNavigate('/govt_schemes')),
-                ]
-              )
-            ),
-            Divider(),
-            BottomNavigationBar(items: [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Dashboard'),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-              BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-            ], onTap: (i){
-              if (i==1) onNavigate('/profile');
-            })
-          ]
-        ),
-      )
+      body: GridView.count(
+        crossAxisCount: 2,
+        padding: const EdgeInsets.all(16.0),
+        children: <Widget>[
+          _buildDashboardCard(context, Icons.agriculture, 'predict_yield_title'.tr(), '/crop_prediction'),
+          _buildDashboardCard(context, Icons.wb_sunny, 'Weather Forecast', '/weather_forecast'),
+          _buildDashboardCard(context, Icons.account_balance, 'Govt. Schemes', '/govt_schemes'),
+          _buildDashboardCard(context, Icons.person, 'Profile', '/profile'),
+        ],
+      ),
     );
   }
-}
 
-class _Card extends StatelessWidget {
-  final String title;
-  final VoidCallback onTap;
-  _Card({required this.title, required this.onTap});
-  @override
-  Widget build(BuildContext context){
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height:160,
-          decoration: BoxDecoration(border: Border.all(color: Colors.black38), borderRadius: BorderRadius.circular(12)),
-          child: Center(child: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize:16))),
+  Widget _buildDashboardCard(BuildContext context, IconData icon, String title, String route) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(context, route),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(icon, size: 50.0, color: Theme.of(context).primaryColor),
+            SizedBox(height: 10.0),
+            Text(title, textAlign: TextAlign.center),
+          ],
         ),
       ),
     );

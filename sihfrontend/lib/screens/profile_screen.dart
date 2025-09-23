@@ -1,33 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../services/api_service.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final String Function(String) t;
-  ProfileScreen({required this.t});
-  final Map<String, String> demoProfile = {
-    'name': 'Ramesh Kumar',
-    'location': 'District 1',
-    'phone': '9876543210',
-    'lastYield': '18 quintals/acre',
-  };
+class ProfileScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context){
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ApiService _apiService = ApiService();
+  Map<String, dynamic>? _profile;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final profile = await _apiService.getProfile();
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load profile: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
-      body: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Name: ${demoProfile['name']}', style: TextStyle(fontSize:18)),
-            SizedBox(height:8),
-            Text('Location: ${demoProfile['location']}'),
-            SizedBox(height:8),
-            Text('Phone: ${demoProfile['phone']}'),
-            SizedBox(height:8),
-            Text('Last Yield: ${demoProfile['lastYield']}'),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Text('profile_title'.tr())),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text(_error!, style: TextStyle(color: Colors.red)))
+              : _profile == null
+                  ? Center(child: Text('No profile data.'))
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Name: ${_profile!['name']}', style: TextStyle(fontSize: 20)),
+                          SizedBox(height: 8),
+                          Text('Phone: ${_profile!['phone']}', style: TextStyle(fontSize: 20)),
+                          SizedBox(height: 8),
+                          Text('District: ${_profile!['location']}', style: TextStyle(fontSize: 20)),
+                          SizedBox(height: 32),
+                          Text('language_label'.tr(), style: TextStyle(fontSize: 20)),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.setLocale(Locale('en'));
+                                },
+                                child: Text('English'),
+                              ),
+                              SizedBox(width: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.setLocale(Locale('hi'));
+                                },
+                                child: Text('हिंदी'),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed: () {
+                              _apiService.deleteToken();
+                              Navigator.pushReplacementNamed(context, '/');
+                            },
+                            child: Text('logout_button'.tr()),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          )
+                        ],
+                      ),
+                    ),
     );
   }
 }

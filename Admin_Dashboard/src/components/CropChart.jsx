@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchAnalytics } from '../services/api';
+import { getAnalytics } from '../services/apiService';
 
 const CropChart = () => {
     const [analytics, setAnalytics] = useState(null);

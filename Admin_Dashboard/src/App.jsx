@@ -1,27 +1,32 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Start from "./pages/Start";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import Farmers from "./pages/Farmers";
-import Analytics from "./pages/Analytics";
-import Data from "./pages/Data";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Farmers from './pages/Farmers';
+import Analytics from './pages/Analytics';
+import Data from './pages/Data';
+import Start from './pages/Start';
+import Dashboard from './pages/Dashboard';
 
-const App = () => {
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" />;
+};
+
+function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<Start />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/farmers" element={<Farmers />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/data" element={<Data />} />
+        <Route path="/farmers" element={<PrivateRoute><Farmers /></PrivateRoute>} />
+        <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
+        <Route path="/data" element={<PrivateRoute><Data /></PrivateRoute>} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-};
+}
 
 export default App;

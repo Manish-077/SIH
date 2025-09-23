@@ -1,53 +1,39 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const Farmer = require('../models/Farmer');
-const Admin = require('../models/Admin');
+require('dotenv').config();
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.farmer = await Farmer.findById(decoded.id).select('-password');
-      next();
-    } catch (error) {
-      res.status(401);
-      throw new Error('Not authorized, token failed');
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            // Get token from header
+            token = req.headers.authorization.split(' ')[1];
+
+            // Verify token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // Get farmer from the token
+            req.farmer = await Farmer.findById(decoded.id).select('-password');
+
+            if (!req.farmer) {
+                res.status(401);
+                throw new Error('Not authorized, farmer not found');
+            }
+
+            next();
+        } catch (error) {
+            console.error(error);
+            res.status(401);
+            throw new Error('Not authorized, token failed');
+        }
     }
-  } else {
-    res.status(401);
-    throw new Error('Not authorized, no token');
-  }
-});
 
-const protectAdmin = asyncHandler(async (req, res, next) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.admin = await Admin.findById(decoded.id).select('-password');
-
-      if (!req.admin) {
+    if (!token) {
         res.status(401);
-        throw new Error('Not authorized, admin not found');
-      }
-
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401);
-      throw new Error('Not authorized, token failed');
+        throw new Error('Not authorized, no token');
     }
-  } else {
-    res.status(401);
-    throw new Error('Not authorized, no token');
-  }
 });
 
-module.exports = { protect, protectAdmin };
+module.exports = { protect };

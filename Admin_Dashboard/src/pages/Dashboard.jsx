@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FarmerTable from '../components/NavBar';
+import NavBar from '../components/NavBar';
+import { getAnalytics } from '../services/apiService';
 
 export default function Dashboard() {
   const [predictions, setPredictions] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/admin/analytics')
-      .then(res => res.json())
+    getAnalytics()
       .then(data => {
         if (data && data.predictions) {
           setPredictions(data.predictions);
