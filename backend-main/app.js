@@ -6,6 +6,7 @@ require('dotenv').config();
 const predictionRoutes = require('./src/routes/predictionRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const farmerRoutes = require('./src/routes/farmerRoutes');
+const schemeRoutes = require('./src/routes/schemeRoutes'); // Import scheme routes
 
 const app = express();
 app.use(express.json());

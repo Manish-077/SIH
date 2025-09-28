@@ -20,7 +20,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> login(String phone, String password) async {
     final response = await http.post(
-      Uri.parse('${Config.apiUrl}/farmer/login'),
+      Uri.parse('${Config.apiUrl}/farmers/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'phone': phone, 'password': password}),
     );
@@ -41,7 +41,7 @@ class ApiService {
     String? location,
   }) async {
     final response = await http.post(
-      Uri.parse('${Config.apiUrl}/farmer/register'),
+      Uri.parse('${Config.apiUrl}/farmers/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'name': name,

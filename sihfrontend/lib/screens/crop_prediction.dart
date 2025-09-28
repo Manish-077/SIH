@@ -10,158 +10,152 @@ class CropPrediction extends StatefulWidget {
 class _CropPredictionState extends State<CropPrediction> {
   final _formKey = GlobalKey<FormState>();
   final _apiService = ApiService();
-
-  final _soilController = TextEditingController();
-  final _rainfallController = TextEditingController();
-  final _tempController = TextEditingController();
-  final _fertilizerController = TextEditingController();
-  // New controllers for missing parameters
-  final _nController = TextEditingController();
-  final _pController = TextEditingController();
-  final _kController = TextEditingController();
-  final _humidityController = TextEditingController();
-  final _phController = TextEditingController();
-  final _cropController = TextEditingController();
-
   bool _isLoading = false;
-  Map<String, dynamic>? _predictionResult;
+  String? _predictedYield;
 
-  void _predict() async {
+  // Form controllers
+  final _rainfallController = TextEditingController();
+  final _temperatureController = TextEditingController();
+  final _waterAvailabilityController = TextEditingController();
+  final _fertilizerController = TextEditingController();
+
+  // Dropdown values
+  String? _selectedCrop;
+  String? _selectedSoilType;
+
+  final _crops = ['Rice', 'Wheat', 'Maize', 'Cotton', 'Sugarcane'];
+  final _soilTypes = ['Sandy', 'Loamy', 'Clay', 'Alluvial', 'Black Soil'];
+
+  void _predictYield() async {
+    print('Predict yield button pressed');
     if (_formKey.currentState!.validate()) {
+      print('Form is valid');
       setState(() {
         _isLoading = true;
-        _predictionResult = null;
+        _predictedYield = null;
       });
 
       try {
+        final params = {
+          'N': 0,
+          'P': 0,
+          'K': 0,
+          'temperature': double.parse(_temperatureController.text),
+          'humidity': double.parse(_waterAvailabilityController.text),
+          'ph': 0,
+          'rainfall': double.parse(_rainfallController.text),
+          'crop': _selectedCrop!,
+          'soil_type': _selectedSoilType!,
+          'fertilizer': double.parse(_fertilizerController.text),
+        };
+        print('Sending prediction request with params: $params');
+
         final result = await _apiService.predictCropYield(
-          N: double.parse(_nController.text),
-          P: double.parse(_pController.text),
-          K: double.parse(_kController.text),
-          temperature: double.parse(_tempController.text),
-          humidity: double.parse(_humidityController.text),
-          ph: double.parse(_phController.text),
+          N: 0,
+          P: 0,
+          K: 0,
+          temperature: double.parse(_temperatureController.text),
+          humidity: double.parse(_waterAvailabilityController.text),
+          ph: 0,
           rainfall: double.parse(_rainfallController.text),
-          crop: _cropController.text,
-          soil_type: _soilController.text,
+          crop: _selectedCrop!,
+          soil_type: _selectedSoilType!,
           fertilizer: double.parse(_fertilizerController.text),
         );
+
+        print('Prediction result: $result');
+
         setState(() {
-          _predictionResult = result;
+          _predictedYield = result['prediction'].toString();
         });
-        _showResultDialog(result['prediction'].toString());
       } catch (e) {
+        print('Error predicting yield: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Failed to predict yield: ${e.toString()}')),
         );
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
+    } else {
+      print('Form is invalid');
     }
-  }
-
-  void _showResultDialog(String yield) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('prediction_result_title'.tr()),
-        content: Text('$yield ${'yield_unit'.tr()}'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('predict_yield_title'.tr())),
+      appBar: AppBar(title: Text('crop_prediction'.tr())),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: _nController,
-                decoration: InputDecoration(labelText: 'N (Nitrogen)'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+              DropdownButtonFormField<String>(
+                value: _selectedCrop,
+                decoration: InputDecoration(labelText: 'Crop'),
+                items: _crops.map((crop) {
+                  return DropdownMenuItem(value: crop, child: Text(crop));
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedCrop = value),
+                validator: (value) => value == null ? 'Please select a crop' : null,
               ),
               SizedBox(height: 16),
-              TextFormField(
-                controller: _pController,
-                decoration: InputDecoration(labelText: 'P (Phosphorus)'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _kController,
-                decoration: InputDecoration(labelText: 'K (Potassium)'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _tempController,
-                decoration: InputDecoration(labelText: 'temperature_hint'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _humidityController,
-                decoration: InputDecoration(labelText: 'Humidity'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _phController,
-                decoration: InputDecoration(labelText: 'pH'.tr()),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+              DropdownButtonFormField<String>(
+                value: _selectedSoilType,
+                decoration: InputDecoration(labelText: 'Soil Type'),
+                items: _soilTypes.map((soil) {
+                  return DropdownMenuItem(value: soil, child: Text(soil));
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedSoilType = value),
+                validator: (value) => value == null ? 'Please select a soil type' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _rainfallController,
-                decoration: InputDecoration(labelText: 'rainfall_hint'.tr()),
+                decoration: InputDecoration(labelText: 'Rainfall (mm)'),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+                validator: (value) => value!.isEmpty ? 'Please enter rainfall' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _cropController,
-                decoration: InputDecoration(labelText: 'Crop Type'.tr()),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+                controller: _temperatureController,
+                decoration: InputDecoration(labelText: 'Temperature (°C)'),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.isEmpty ? 'Please enter temperature' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _soilController,
-                decoration: InputDecoration(labelText: 'soil_type_hint'.tr()),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+                controller: _waterAvailabilityController,
+                decoration: InputDecoration(labelText: 'Water Availability (%)'),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.isEmpty ? 'Please enter water availability' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _fertilizerController,
-                decoration: InputDecoration(labelText: 'fertilizer_hint'.tr()),
+                decoration: InputDecoration(labelText: 'Fertilizer Usage (kg/acre)'),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Required' : null,
+                validator: (value) => value!.isEmpty ? 'Please enter fertilizer usage' : null,
               ),
               SizedBox(height: 32),
               _isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                      onPressed: _predict,
-                      child: Text('predict_button'.tr()),
+                      onPressed: _predictYield,
+                      child: Text('predict_yield'.tr()),
                     ),
+              if (_predictedYield != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    'Estimated Yield: $_predictedYield quintals/acre',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),

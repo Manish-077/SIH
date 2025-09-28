@@ -26,7 +26,10 @@ class _SignupScreenState extends State<SignupScreen> {
           phone: _phoneController.text,
           password: _passwordController.text,
         );
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration successful! Please log in.')),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to register: ${e.toString()}')),

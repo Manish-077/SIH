@@ -120,4 +120,15 @@ const predictCropYield = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerFarmer, authFarmer, getProfile, getFarmers, predictCropYield };
+const deleteFarmer = asyncHandler(async (req, res) => {
+  const farmer = await Farmer.findByIdAndDelete(req.params.id);
+
+  if (farmer) {
+    res.json({ message: 'Farmer removed', id: req.params.id });
+  } else {
+    res.status(404);
+    throw new Error('Farmer not found');
+  }
+});
+
+module.exports = { registerFarmer, authFarmer, getProfile, getFarmers, predictCropYield, deleteFarmer };

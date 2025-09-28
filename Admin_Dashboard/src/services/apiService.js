@@ -5,6 +5,16 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 export const getAnalytics = async () => {
   try {
     const response = await apiClient.get('/admin/analytics');
@@ -45,6 +55,16 @@ export const getFarmers = async () => {
   }
 };
 
+export const deleteFarmer = async (farmerId) => {
+  try {
+    const response = await apiClient.delete(`/farmers/${farmerId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting farmer:', error);
+    throw error;
+  }
+};
+
 export const uploadDataset = async (file) => {
   const formData = new FormData();
   formData.append('dataset', file);
@@ -58,6 +78,36 @@ export const uploadDataset = async (file) => {
     return response.data;
   } catch (error) {
     console.error('Error uploading dataset:', error);
+    throw error;
+  }
+};
+
+export const getSchemes = async () => {
+  try {
+    const response = await apiClient.get('/schemes');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching schemes:', error);
+    throw error;
+  }
+};
+
+export const createScheme = async (schemeData) => {
+  try {
+    const response = await apiClient.post('/schemes', schemeData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating scheme:', error);
+    throw error;
+  }
+};
+
+export const deleteScheme = async (schemeId) => {
+  try {
+    const response = await apiClient.delete(`/schemes/${schemeId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting scheme:', error);
     throw error;
   }
 };
